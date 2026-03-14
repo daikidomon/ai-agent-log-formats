@@ -8,37 +8,37 @@ AIコーディングエージェント／アシスタントの対話履歴（プ
 
 | カテゴリ | ツール | ログ形式 | ローカルログ | 詳細 |
 |---------|--------|---------|:----------:|------|
-| **CLI** | [Claude Code](ja/tools/claude-code.md) | JSONL | Yes | history.jsonl + プロジェクト別セッション |
-| **CLI** | [OpenAI Codex CLI](ja/tools/openai-codex.md) | JSONL | Yes | rollout セッションファイル |
-| **CLI** | [Aider](ja/tools/aider.md) | Markdown / SQLite | Yes | チャット履歴 + DB |
-| **CLI** | [amp](ja/tools/amp.md) | JSONL | Yes | セッションファイル |
-| **エディタ** | [Cursor](ja/tools/cursor.md) | SQLite | Yes | state.vscdb + 独自ストレージ |
-| **エディタ** | [Trae](ja/tools/trae.md) | SQLite / JSON | Yes | VS Code系構造 |
-| **エディタ** | [Zed AI](ja/tools/zed-ai.md) | JSON | Yes | conversations ディレクトリ |
-| **エディタ** | [PearAI](ja/tools/pearai.md) | SQLite / JSON | Yes | VS Code系構造 |
-| **エディタ** | [Void](ja/tools/void.md) | SQLite / JSON | Yes | VS Code系構造 |
-| **VS Code拡張** | [GitHub Copilot Chat](ja/tools/github-copilot-chat.md) | SQLite | Yes | state.vscdb |
-| **VS Code拡張** | [Cline](ja/tools/cline.md) | JSON | Yes | api_conversation_history.json |
-| **VS Code拡張** | [Roo Code](ja/tools/roo-code.md) | JSON | Yes | Cline同一構造 |
-| **VS Code拡張** | [Kilo Code](ja/tools/kilo-code.md) | JSON | Yes | Cline系フォーク |
-| **VS Code拡張** | [Continue](ja/tools/continue.md) | JSON | Yes | セッションJSON |
-| **VS Code拡張** | [Sourcegraph Cody](ja/tools/sourcegraph-cody.md) | JSON | Yes | globalStorage内 |
-| **VS Code拡張** | [Amazon Q Developer](ja/tools/amazon-q-developer.md) | JSON | Yes | globalStorage内 |
-| **VS Code拡張** | [Augment Code](ja/tools/augment-code.md) | 不明 | 要調査 | — |
-| **IDE内蔵** | [JetBrains AI Assistant](ja/tools/jetbrains-ai.md) | XML / JSON | Yes | IDE設定ディレクトリ |
-| **IDE内蔵** | [Gemini Code Assist](ja/tools/gemini-code-assist.md) | 不明 | 要調査 | — |
-| **IDE/エディタ** | [Windsurf (Cascade)](ja/tools/windsurf.md) | テキスト | Yes | 自動要約メモリ |
-| **IDE/エディタ** | [OpenCode](ja/tools/opencode.md) | SQLite | Yes | opencode.db |
-| **IDE/エディタ** | [Google Antigravity](ja/tools/google-antigravity.md) | テキスト | Yes | ログファイル |
-| **自律エージェント** | [SWE-agent](ja/tools/swe-agent.md) | JSON | Yes | trajectory ファイル |
-| **自律エージェント** | [OpenHands](ja/tools/openhands.md) | JSON | Yes | セッションログ |
-| **クラウド** | [Devin](ja/tools/devin.md) | — | No | クラウド側のみ |
-| **クラウド** | [Replit Agent](ja/tools/replit-agent.md) | — | No | クラウド側のみ |
-| **クラウド** | [Bolt](ja/tools/bolt.md) | — | No | ブラウザ完結 |
-| **クラウド** | [Lovable](ja/tools/lovable.md) | — | No | ブラウザ完結 |
-| **クラウド** | [v0](ja/tools/v0.md) | — | No | ブラウザ完結 |
-| **補完特化** | [Tabnine](ja/tools/tabnine.md) | — | 限定的 | 対話ログなし（補完主体） |
-| **補完特化** | [Supermaven](ja/tools/supermaven.md) | — | 限定的 | 対話ログなし（補完主体） |
+| **CLI** | [Claude Code](tools/claude-code/ja.md) | JSONL | Yes | history.jsonl + プロジェクト別セッション |
+| **CLI** | [OpenAI Codex CLI](tools/openai-codex/ja.md) | JSONL | Yes | rollout セッションファイル |
+| **CLI** | [Aider](tools/aider/ja.md) | Markdown / SQLite | Yes | チャット履歴 + DB |
+| **CLI** | [amp](tools/amp/ja.md) | JSONL | Yes | セッションファイル |
+| **エディタ** | [Cursor](tools/cursor/ja.md) | SQLite | Yes | state.vscdb + 独自ストレージ |
+| **エディタ** | [Trae](tools/trae/ja.md) | SQLite / JSON | Yes | VS Code系構造 |
+| **エディタ** | [Zed AI](tools/zed-ai/ja.md) | JSON | Yes | conversations ディレクトリ |
+| **エディタ** | [PearAI](tools/pearai/ja.md) | SQLite / JSON | Yes | VS Code系構造 |
+| **エディタ** | [Void](tools/void/ja.md) | SQLite / JSON | Yes | VS Code系構造 |
+| **VS Code拡張** | [GitHub Copilot Chat](tools/github-copilot-chat/ja.md) | SQLite | Yes | state.vscdb |
+| **VS Code拡張** | [Cline](tools/cline/ja.md) | JSON | Yes | api_conversation_history.json |
+| **VS Code拡張** | [Roo Code](tools/roo-code/ja.md) | JSON | Yes | Cline同一構造 |
+| **VS Code拡張** | [Kilo Code](tools/kilo-code/ja.md) | JSON | Yes | Cline系フォーク |
+| **VS Code拡張** | [Continue](tools/continue/ja.md) | JSON | Yes | セッションJSON |
+| **VS Code拡張** | [Sourcegraph Cody](tools/sourcegraph-cody/ja.md) | JSON | Yes | globalStorage内 |
+| **VS Code拡張** | [Amazon Q Developer](tools/amazon-q-developer/ja.md) | JSON | Yes | globalStorage内 |
+| **VS Code拡張** | [Augment Code](tools/augment-code/ja.md) | 不明 | 要調査 | — |
+| **IDE内蔵** | [JetBrains AI Assistant](tools/jetbrains-ai/ja.md) | XML / JSON | Yes | IDE設定ディレクトリ |
+| **IDE内蔵** | [Gemini Code Assist](tools/gemini-code-assist/ja.md) | 不明 | 要調査 | — |
+| **IDE/エディタ** | [Windsurf (Cascade)](tools/windsurf/ja.md) | テキスト | Yes | 自動要約メモリ |
+| **IDE/エディタ** | [OpenCode](tools/opencode/ja.md) | SQLite | Yes | opencode.db |
+| **IDE/エディタ** | [Google Antigravity](tools/google-antigravity/ja.md) | テキスト | Yes | ログファイル |
+| **自律エージェント** | [SWE-agent](tools/swe-agent/ja.md) | JSON | Yes | trajectory ファイル |
+| **自律エージェント** | [OpenHands](tools/openhands/ja.md) | JSON | Yes | セッションログ |
+| **クラウド** | [Devin](tools/devin/ja.md) | — | No | クラウド側のみ |
+| **クラウド** | [Replit Agent](tools/replit-agent/ja.md) | — | No | クラウド側のみ |
+| **クラウド** | [Bolt](tools/bolt/ja.md) | — | No | ブラウザ完結 |
+| **クラウド** | [Lovable](tools/lovable/ja.md) | — | No | ブラウザ完結 |
+| **クラウド** | [v0](tools/v0/ja.md) | — | No | ブラウザ完結 |
+| **補完特化** | [Tabnine](tools/tabnine/ja.md) | — | 限定的 | 対話ログなし（補完主体） |
+| **補完特化** | [Supermaven](tools/supermaven/ja.md) | — | 限定的 | 対話ログなし（補完主体） |
 
 ### 凡例
 
@@ -49,10 +49,16 @@ AIコーディングエージェント／アシスタントの対話履歴（プ
 
 ```
 ai-agent-log-formats/
-├── README.md          # 英語版
-├── README.ja.md       # 日本語版
-├── en/tools/          # 英語版ツールドキュメント
-└── ja/tools/          # 日本語版ツールドキュメント
+├── README.md              # 英語版
+├── README.ja.md           # 日本語版
+└── tools/
+    ├── claude-code/
+    │   ├── en.md          # English
+    │   └── ja.md          # 日本語
+    ├── cursor/
+    │   ├── en.md
+    │   └── ja.md
+    └── ...
 ```
 
 ## 注意事項
