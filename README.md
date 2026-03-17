@@ -32,7 +32,7 @@ A reference guide for conversation history storage formats and retrieval methods
 | **IDE Built-in** | [Gemini Code Assist](tools/gemini-code-assist/) | Unknown | TBD | | — |
 | **IDE/Editor** | [Windsurf (Cascade)](tools/windsurf/) | Text | Yes | | Auto-summary memory |
 | **IDE/Editor** | [OpenCode](tools/opencode/) | SQLite | Yes | :white_check_mark: | opencode.db |
-| **IDE/Editor** | [Google Antigravity](tools/google-antigravity/) | Text | Yes | | Log files |
+| **IDE/Editor** | [Google Antigravity](tools/google-antigravity/) | Protobuf + SQLite + Text | Yes | :white_check_mark: | brain/ logs + state.vscdb |
 | **Autonomous** | [SWE-agent](tools/swe-agent/) | JSON | Yes | | Trajectory files |
 | **Autonomous** | [OpenHands](tools/openhands/) | JSON | Yes | | Session logs |
 | **Cloud** | [Devin](tools/devin/) | — | No | | Cloud only |

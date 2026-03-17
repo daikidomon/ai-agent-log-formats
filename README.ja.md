@@ -32,7 +32,7 @@ AIコーディングエージェント／アシスタントの対話履歴（プ
 | **IDE内蔵** | [Gemini Code Assist](tools/gemini-code-assist/README.ja.md) | 不明 | 要調査 | | — |
 | **IDE/エディタ** | [Windsurf (Cascade)](tools/windsurf/README.ja.md) | テキスト | Yes | | 自動要約メモリ |
 | **IDE/エディタ** | [OpenCode](tools/opencode/README.ja.md) | SQLite | Yes | :white_check_mark: | opencode.db |
-| **IDE/エディタ** | [Google Antigravity](tools/google-antigravity/README.ja.md) | テキスト | Yes | | ログファイル |
+| **IDE/エディタ** | [Google Antigravity](tools/google-antigravity/README.ja.md) | Protobuf + SQLite + テキスト | Yes | :white_check_mark: | brain/ ログ + state.vscdb |
 | **自律エージェント** | [SWE-agent](tools/swe-agent/README.ja.md) | JSON | Yes | | trajectory ファイル |
 | **自律エージェント** | [OpenHands](tools/openhands/README.ja.md) | JSON | Yes | | セッションログ |
 | **クラウド** | [Devin](tools/devin/README.ja.md) | — | No | | クラウド側のみ |
