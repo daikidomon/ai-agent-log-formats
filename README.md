@@ -15,6 +15,7 @@ A reference guide for conversation history storage formats and retrieval methods
 | **CLI** | [Gemini CLI](tools/gemini-cli/) | JSON | Yes | :white_check_mark: | Project-specific sessions + named checkpoints |
 | **CLI** | [Grok CLI](tools/grok-cli/) | — | No | :white_check_mark: | Claude Code proxy wrapper; logs stored in `~/.claude/` |
 | **CLI** | [Ollama](tools/ollama/) | — | Limited | :white_check_mark: | Command history only; no conversation persistence |
+| **CLI** | [GitHub Copilot CLI](tools/github-copilot-cli/) | JSONL + YAML | Yes | :white_check_mark: | events.jsonl + workspace.yaml per session |
 | **Editor** | [Cursor](tools/cursor/) | JSONL + SQLite | Yes | :white_check_mark: | CLI: `~/.cursor/` transcripts + store.db; GUI: state.vscdb |
 | **Editor** | [Trae](tools/trae/) | SQLite / JSON | Yes | | VS Code-based structure |
 | **Editor** | [Zed AI](tools/zed-ai/) | JSON | Yes | | Conversations directory |

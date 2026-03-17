@@ -15,6 +15,7 @@ AIコーディングエージェント／アシスタントの対話履歴（プ
 | **CLI** | [Gemini CLI](tools/gemini-cli/README.ja.md) | JSON | Yes | :white_check_mark: | プロジェクト別セッション + 名前付きチェックポイント |
 | **CLI** | [Grok CLI](tools/grok-cli/README.ja.md) | — | No | :white_check_mark: | Claude Code プロキシラッパー。ログは `~/.claude/` に保存 |
 | **CLI** | [Ollama](tools/ollama/README.ja.md) | — | 限定的 | :white_check_mark: | コマンド履歴のみ。会話の永続化なし |
+| **CLI** | [GitHub Copilot CLI](tools/github-copilot-cli/README.ja.md) | JSONL + YAML | Yes | :white_check_mark: | セッション別 events.jsonl + workspace.yaml |
 | **エディタ** | [Cursor](tools/cursor/README.ja.md) | JSONL + SQLite | Yes | :white_check_mark: | CLI: `~/.cursor/` トランスクリプト + store.db; GUI: state.vscdb |
 | **エディタ** | [Trae](tools/trae/README.ja.md) | SQLite / JSON | Yes | | VS Code系構造 |
 | **エディタ** | [Zed AI](tools/zed-ai/README.ja.md) | JSON | Yes | | conversations ディレクトリ |
