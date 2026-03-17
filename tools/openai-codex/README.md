@@ -22,51 +22,117 @@ If the environment variable `CODEX_HOME` is set, `$CODEX_HOME/sessions/` is used
 
 ```
 ~/.codex/
-├── config.toml                                    # Configuration file
-├── state-v5.db                                    # Thread metadata (SQLite)
-├── session_index.jsonl                            # Session index
-└── sessions/
-    └── YYYY/MM/DD/
-        └── rollout-YYYY-MM-DDThh-mm-ss-<id>.jsonl # Conversation log per session
+├── sessions/
+│   └── rollout-YYYY-MM-DDThh-mm-ss-<uuid>.jsonl  # Conversation log per session
+└── tmp/                                            # Temporary files
 ```
 
 ## Data Format
 
-Each line is a JSON object. The type of each line is determined by the top-level key.
+Each line is a JSON object with `timestamp`, `type`, and `payload` fields. The `type` field determines the entry kind.
 
-### SessionMeta (Session Start Metadata)
+### session_meta (Session Start Metadata)
 
 ```json
 {
-  "timestamp": "2025-06-15T10:30:00.123Z",
-  "SessionMeta": {
-    "cwd": "/path/to/project",
-    "model_provider": "openai"
+  "timestamp": "2026-03-17T08:30:00.000Z",
+  "type": "session_meta",
+  "payload": {
+    "id": "abcd1234-5678-9012-3456-789012345678",
+    "cwd": "/home/user/project",
+    "cli_version": "0.114.0",
+    "source": "cli",
+    "model_provider": "openai",
+    "git": {
+      "commit_hash": "abc123def",
+      "branch": "main",
+      "repository_url": "https://github.com/user/project"
+    }
   }
 }
 ```
 
-### ResponseItem (Conversation Item)
+### event_msg (User Message / Task Events)
 
 ```json
 {
-  "timestamp": "2025-06-15T10:30:01.000Z",
-  "ResponseItem": {
+  "timestamp": "2026-03-17T08:30:05.000Z",
+  "type": "event_msg",
+  "payload": {
+    "type": "user_message",
+    "message": "User's input text"
+  }
+}
+```
+
+### response_item (Model Response)
+
+```json
+{
+  "timestamp": "2026-03-17T08:30:10.000Z",
+  "type": "response_item",
+  "payload": {
     "type": "message",
-    "role": "user",
+    "role": "assistant",
     "content": [
-      {"type": "input_text", "text": "User's input"}
+      {"type": "output_text", "text": "Assistant's response"}
     ]
   }
 }
 ```
 
-| Key | Description |
-|-----|-------------|
-| `SessionMeta.cwd` | Project directory |
-| `ResponseItem.type` | `"message"` = conversation message |
-| `ResponseItem.role` | `"user"` / `"assistant"` |
-| `ResponseItem.content[].type` | `"input_text"` or `"text"` |
+### response_item (Shell Command Execution)
+
+```json
+{
+  "timestamp": "2026-03-17T08:30:18.000Z",
+  "type": "response_item",
+  "payload": {
+    "type": "local_shell_call",
+    "action": {
+      "command": ["ls", "-la"],
+      "cwd": "/home/user/project"
+    }
+  }
+}
+```
+
+### response_item (Command Output)
+
+```json
+{
+  "timestamp": "2026-03-17T08:30:20.000Z",
+  "type": "response_item",
+  "payload": {
+    "type": "function_call_output",
+    "output": "total 32\ndrwxr-xr-x  5 user user 4096 ..."
+  }
+}
+```
+
+### Entry Types
+
+| `type` | `payload.type` | Description |
+|--------|---------------|-------------|
+| `session_meta` | — | Session metadata (cwd, model, git info) |
+| `event_msg` | `user_message` | User input message |
+| `event_msg` | `task_complete` | Task completion event |
+| `response_item` | `message` | Model text response |
+| `response_item` | `local_shell_call` | Shell command execution |
+| `response_item` | `function_call_output` | Command/function output |
+
+### session_meta Payload Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Session UUID |
+| `cwd` | string | Project directory |
+| `cli_version` | string | Codex CLI version |
+| `source` | string | Source type (e.g., `"cli"`) |
+| `model_provider` | string | Model provider (e.g., `"openai"`) |
+| `git.commit_hash` | string | Current git commit hash |
+| `git.branch` | string | Current git branch |
+| `git.repository_url` | string | Git repository URL |
 
 ## Retrieval Method
 
@@ -77,40 +143,37 @@ from pathlib import Path
 codex_home = Path.home() / ".codex"
 sessions_dir = codex_home / "sessions"
 
-for rollout_path in sorted(sessions_dir.rglob("rollout-*.jsonl"),
+for rollout_path in sorted(sessions_dir.glob("rollout-*.jsonl"),
                            key=lambda p: p.stat().st_mtime, reverse=True)[:50]:
     cwd = ""
     with open(rollout_path, "r", encoding="utf-8") as f:
         for line in f:
             entry = json.loads(line.strip())
+            entry_type = entry.get("type")
+            payload = entry.get("payload", {})
 
-            # Get project information from SessionMeta
-            session_meta = entry.get("SessionMeta")
-            if session_meta:
-                cwd = session_meta.get("cwd", "")
+            # Get project info from session_meta
+            if entry_type == "session_meta":
+                cwd = payload.get("cwd", "")
                 continue
 
-            # Extract user messages from ResponseItem
-            response_item = entry.get("ResponseItem")
-            if not response_item:
-                continue
-            if response_item.get("type") != "message" or response_item.get("role") != "user":
-                continue
+            # Extract user messages from event_msg
+            if entry_type == "event_msg" and payload.get("type") == "user_message":
+                text = payload.get("message", "").strip()
+                if text:
+                    print(f"[{cwd}] {text}")
 
-            content = response_item.get("content", [])
-            texts = []
-            for part in content:
-                if isinstance(part, dict) and part.get("type") in ("input_text", "text"):
-                    texts.append(part.get("text", ""))
-
-            text = " ".join(texts).strip()
-            if text:
-                print(f"[{cwd}] {text}")
+            # Extract assistant responses from response_item
+            if entry_type == "response_item" and payload.get("type") == "message":
+                for part in payload.get("content", []):
+                    if isinstance(part, dict) and part.get("type") == "output_text":
+                        print(f"  → {part.get('text', '')[:100]}")
 ```
 
 ## Notes
 
-- Sessions are stored globally (not in per-project directories)
-- Project information is obtained from the `cwd` field in `SessionMeta`
-- Codex is built in Rust, so JSONL key names use CamelCase (`SessionMeta`, `ResponseItem`)
-- `state-v5.db` also contains thread metadata, but conversation content is stored in rollout JSONL files
+- Session files are stored flat in `sessions/` (no date-based subdirectories)
+- Project information is obtained from the `cwd` field in `session_meta` payload
+- JSON uses `type`/`payload` structure (not CamelCase top-level keys)
+- Content types include `output_text` (responses), `local_shell_call` (commands), `function_call_output` (results)
+- Session metadata includes git information (commit, branch, repository URL)

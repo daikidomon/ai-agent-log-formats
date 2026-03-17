@@ -22,51 +22,117 @@
 
 ```
 ~/.codex/
-├── config.toml                                    # 設定ファイル
-├── state-v5.db                                    # スレッドメタデータ（SQLite）
-├── session_index.jsonl                            # セッションインデックス
-└── sessions/
-    └── YYYY/MM/DD/
-        └── rollout-YYYY-MM-DDThh-mm-ss-<id>.jsonl # セッション別会話ログ
+├── sessions/
+│   └── rollout-YYYY-MM-DDThh-mm-ss-<uuid>.jsonl  # セッション別会話ログ
+└── tmp/                                            # 一時ファイル
 ```
 
 ## データ形式
 
-各行がJSONオブジェクト。行の種別はトップレベルのキーで判別する。
+各行が `timestamp`, `type`, `payload` フィールドを持つ JSON オブジェクト。`type` フィールドでエントリ種別を判別する。
 
-### SessionMeta（セッション開始時のメタ情報）
+### session_meta（セッション開始時のメタ情報）
 
 ```json
 {
-  "timestamp": "2025-06-15T10:30:00.123Z",
-  "SessionMeta": {
-    "cwd": "/path/to/project",
-    "model_provider": "openai"
+  "timestamp": "2026-03-17T08:30:00.000Z",
+  "type": "session_meta",
+  "payload": {
+    "id": "abcd1234-5678-9012-3456-789012345678",
+    "cwd": "/home/user/project",
+    "cli_version": "0.114.0",
+    "source": "cli",
+    "model_provider": "openai",
+    "git": {
+      "commit_hash": "abc123def",
+      "branch": "main",
+      "repository_url": "https://github.com/user/project"
+    }
   }
 }
 ```
 
-### ResponseItem（会話アイテム）
+### event_msg（ユーザーメッセージ / タスクイベント）
 
 ```json
 {
-  "timestamp": "2025-06-15T10:30:01.000Z",
-  "ResponseItem": {
+  "timestamp": "2026-03-17T08:30:05.000Z",
+  "type": "event_msg",
+  "payload": {
+    "type": "user_message",
+    "message": "ユーザーの入力テキスト"
+  }
+}
+```
+
+### response_item（モデル応答）
+
+```json
+{
+  "timestamp": "2026-03-17T08:30:10.000Z",
+  "type": "response_item",
+  "payload": {
     "type": "message",
-    "role": "user",
+    "role": "assistant",
     "content": [
-      {"type": "input_text", "text": "ユーザーの入力"}
+      {"type": "output_text", "text": "アシスタントの応答"}
     ]
   }
 }
 ```
 
-| キー | 説明 |
-|------|------|
-| `SessionMeta.cwd` | プロジェクトディレクトリ |
-| `ResponseItem.type` | `"message"` = 会話メッセージ |
-| `ResponseItem.role` | `"user"` / `"assistant"` |
-| `ResponseItem.content[].type` | `"input_text"` or `"text"` |
+### response_item（シェルコマンド実行）
+
+```json
+{
+  "timestamp": "2026-03-17T08:30:18.000Z",
+  "type": "response_item",
+  "payload": {
+    "type": "local_shell_call",
+    "action": {
+      "command": ["ls", "-la"],
+      "cwd": "/home/user/project"
+    }
+  }
+}
+```
+
+### response_item（コマンド出力）
+
+```json
+{
+  "timestamp": "2026-03-17T08:30:20.000Z",
+  "type": "response_item",
+  "payload": {
+    "type": "function_call_output",
+    "output": "total 32\ndrwxr-xr-x  5 user user 4096 ..."
+  }
+}
+```
+
+### エントリ種別
+
+| `type` | `payload.type` | 説明 |
+|--------|---------------|------|
+| `session_meta` | — | セッションメタデータ（cwd、モデル、git情報） |
+| `event_msg` | `user_message` | ユーザー入力メッセージ |
+| `event_msg` | `task_complete` | タスク完了イベント |
+| `response_item` | `message` | モデルのテキスト応答 |
+| `response_item` | `local_shell_call` | シェルコマンド実行 |
+| `response_item` | `function_call_output` | コマンド/関数の出力 |
+
+### session_meta payload のフィールド
+
+| フィールド | 型 | 説明 |
+|-----------|-----|------|
+| `id` | string | セッション UUID |
+| `cwd` | string | プロジェクトディレクトリ |
+| `cli_version` | string | Codex CLI バージョン |
+| `source` | string | ソース種別（例: `"cli"`） |
+| `model_provider` | string | モデルプロバイダー（例: `"openai"`） |
+| `git.commit_hash` | string | 現在の git コミットハッシュ |
+| `git.branch` | string | 現在の git ブランチ |
+| `git.repository_url` | string | Git リポジトリ URL |
 
 ## 取得方法
 
@@ -77,40 +143,37 @@ from pathlib import Path
 codex_home = Path.home() / ".codex"
 sessions_dir = codex_home / "sessions"
 
-for rollout_path in sorted(sessions_dir.rglob("rollout-*.jsonl"),
+for rollout_path in sorted(sessions_dir.glob("rollout-*.jsonl"),
                            key=lambda p: p.stat().st_mtime, reverse=True)[:50]:
     cwd = ""
     with open(rollout_path, "r", encoding="utf-8") as f:
         for line in f:
             entry = json.loads(line.strip())
+            entry_type = entry.get("type")
+            payload = entry.get("payload", {})
 
-            # SessionMeta からプロジェクト情報を取得
-            session_meta = entry.get("SessionMeta")
-            if session_meta:
-                cwd = session_meta.get("cwd", "")
+            # session_meta からプロジェクト情報を取得
+            if entry_type == "session_meta":
+                cwd = payload.get("cwd", "")
                 continue
 
-            # ResponseItem からユーザーメッセージを抽出
-            response_item = entry.get("ResponseItem")
-            if not response_item:
-                continue
-            if response_item.get("type") != "message" or response_item.get("role") != "user":
-                continue
+            # event_msg からユーザーメッセージを抽出
+            if entry_type == "event_msg" and payload.get("type") == "user_message":
+                text = payload.get("message", "").strip()
+                if text:
+                    print(f"[{cwd}] {text}")
 
-            content = response_item.get("content", [])
-            texts = []
-            for part in content:
-                if isinstance(part, dict) and part.get("type") in ("input_text", "text"):
-                    texts.append(part.get("text", ""))
-
-            text = " ".join(texts).strip()
-            if text:
-                print(f"[{cwd}] {text}")
+            # response_item からアシスタント応答を抽出
+            if entry_type == "response_item" and payload.get("type") == "message":
+                for part in payload.get("content", []):
+                    if isinstance(part, dict) and part.get("type") == "output_text":
+                        print(f"  → {part.get('text', '')[:100]}")
 ```
 
 ## 注意事項
 
-- セッションはグローバル保存（プロジェクト別ディレクトリではない）
-- プロジェクト情報は `SessionMeta` の `cwd` フィールドから取得
-- Codex は Rust 製のため、JSONL のキー名が CamelCase（`SessionMeta`, `ResponseItem`）
-- `state-v5.db` にもスレッドメタデータがあるが、会話内容は rollout JSONL に保存
+- セッションファイルは `sessions/` 直下にフラットに保存（日付別サブディレクトリなし）
+- プロジェクト情報は `session_meta` の `payload.cwd` フィールドから取得
+- JSON は `type`/`payload` 構造を使用（CamelCase トップレベルキーではない）
+- コンテンツ種別: `output_text`（応答）、`local_shell_call`（コマンド）、`function_call_output`（結果）
+- セッションメタデータに git 情報（コミット、ブランチ、リポジトリ URL）が含まれる
